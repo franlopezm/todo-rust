@@ -7,7 +7,7 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug executable 'todo-rust'",
+      "name": "Debug executable",
       "cargo": {
         "args": [
           "build",
@@ -25,7 +25,7 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug unit tests in executable 'todo-rust'",
+      "name": "Debug unit tests",
       "cargo": {
         "args": [
           "test",
