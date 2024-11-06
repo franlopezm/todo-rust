@@ -1,4 +1,5 @@
 use actix_web::{get, web, App, HttpServer, Responder};
+use dotenv::dotenv;
 mod env_config;
 
 #[get("/hello/{name}")]
@@ -8,6 +9,8 @@ async fn greet(name: web::Path<String>) -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    dotenv().ok();
+
     let config = env_config::get();
 
     println!(
