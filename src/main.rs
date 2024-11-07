@@ -1,11 +1,12 @@
-use actix_web::{get, web, App, HttpServer, Responder};
-use dotenv::dotenv;
+mod controllers;
+mod db;
 mod env_config;
+mod tasks;
 
-#[get("/hello/{name}")]
-async fn greet(name: web::Path<String>) -> impl Responder {
-    format!("Hello {name}!")
-}
+use std::sync::Mutex;
+
+use actix_web::{web, App, HttpServer};
+use dotenv::dotenv;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -18,8 +19,16 @@ async fn main() -> std::io::Result<()> {
         config.service_ip, config.service_port
     );
 
-    HttpServer::new(move || App::new().service(greet))
-        .bind((config.service_ip, config.service_port))?
-        .run()
-        .await
+    let app_state = web::Data::new(db::AppState {
+        task: Mutex::new(vec![]),
+    });
+
+    HttpServer::new(move || {
+        App::new()
+            .app_data(app_state.clone())
+            .service(controllers::routes())
+    })
+    .bind((config.service_ip, config.service_port))?
+    .run()
+    .await
 }
