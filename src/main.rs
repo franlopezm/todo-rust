@@ -16,7 +16,7 @@ async fn main() -> std::io::Result<()> {
 
     println!(
         "Server run in http://{}:{}",
-        config.service_ip, config.service_port
+        config.service_host, config.service_port
     );
 
     let app_state = web::Data::new(db::AppState {
@@ -28,7 +28,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(app_state.clone())
             .service(controllers::routes())
     })
-    .bind((config.service_ip, config.service_port))?
+    .bind((config.service_host, config.service_port))?
     .run()
     .await
 }
