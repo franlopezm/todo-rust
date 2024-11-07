@@ -15,3 +15,4 @@ Cargo.lock
 
 # Others
 *.env
+*_main.rs
