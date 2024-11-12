@@ -1,0 +1,243 @@
+openapi: 3.0.3
+info:
+  title: Todo-rust
+  version: 1.0.0
+
+servers:
+  - url: http://127.0.0.1:8000/api
+    description: Localhost
+
+tags:
+  - name: TASK
+    description: Endpoints related to task management.
+
+paths:
+  /tasks/add:
+    post:
+      tags:
+        - TASK
+      summary: Add a new task.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - text
+              properties:
+                text:
+                  type: string
+                  description: Description of the task to be created.
+                  example: Add more functionality to tasks
+      responses:
+        201:
+          description: Task created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        400:
+          description: Bad Request.
+
+  /tasks/list:
+    get:
+      tags:
+        - TASK
+      summary: Get all tasks
+      responses:
+        200:
+          description: Task List.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+        400:
+          description: Bad Request.
+
+  /tasks/{task_id}:
+    get:
+      tags:
+        - TASK
+      summary: Find a task by ID.
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          description: Unique identifier of the task.
+          schema:
+            type: string
+            format: uuidv4
+      responses:
+        200:
+          description: Task found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        404:
+          $ref: "#/components/responses/404TaskNotFound"
+    put:
+      tags:
+        - TASK
+      summary: Update a task by ID.
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          description: Unique identifier of the task.
+          schema:
+            type: string
+            format: uuidv4
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - text
+              properties:
+                text:
+                  type: string
+                  description: Description of the task to be created.
+                  example: Add more functionality to tasks
+      responses:
+        200:
+          description: Returns the task we just updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        400:
+          description: Bad Request.
+        404:
+          $ref: "#/components/responses/404TaskNotFound"
+    delete:
+      tags:
+        - TASK
+      summary: Delete a task by ID.
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          description: Unique identifier of the task.
+          schema:
+            type: string
+            format: uuidv4
+      responses:
+        200:
+          description: Returns the task we just deleted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        404:
+          $ref: "#/components/responses/404TaskNotFound"
+
+  /tasks/{task_id}/done:
+    put:
+      tags:
+        - TASK
+      summary: Change the status of a task by ID.
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          description: Unique identifier of the task.
+          schema:
+            type: string
+            format: uuidv4
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - done
+              properties:
+                done:
+                  type: boolean
+                  description: Indicates whether the task is finished or not.
+                  default: false
+                  example: false
+      responses:
+        200:
+          description: Returns the task we just updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        400:
+          description: Bad Request.
+        404:
+          $ref: "#/components/responses/404TaskNotFound"
+
+components:
+  schemas:
+    Task:
+      type: object
+      required:
+        - id
+        - text
+        - done
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the task.
+          format: uuidv4
+          example: 451cdfcc-c304-48fe-a761-4a318d87d1dd
+        text:
+          type: string
+          description: Description of the task.
+          example: Add a new task tagging functionality.
+        done:
+          type: boolean
+          description: Indicates whether the task is finished or not.
+          default: false
+          example: false
+        completed_at:
+          type: string
+          description: Date (UTC-0) on which the task was completed. This field only has a value if the "done" field has a value of true.
+          default: null
+          format: date-time
+          example: "2024-11-12T14:05:38.208828Z"
+        created_at:
+          type: string
+          description: Date (UTC-0) on which the task was created.
+          default: null
+          format: date-time
+          example: "2024-11-12T14:00:31.208810Z"
+        updated_at:
+          type: string
+          description: Date (UTC-0) on which the task was last updated.
+          default: null
+          format: date-time
+          example: "2024-11-12T14:05:38.208828Z"
+
+  responses:
+    404TaskNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            description: Error displayed when the task searched for by the indicated ID is not found.
+            required:
+              - error
+              - message
+            properties:
+              error:
+                type: string
+                description: Type of error.
+                example: not-found
+              message:
+                type: string
+                description: Long error message.
+                example: Task not found.
+
+
+
+
